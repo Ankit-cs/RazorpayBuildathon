@@ -1,0 +1,32 @@
+{
+  "status": "measured",
+  "measured_at": "2026-09-01T21:16:10.486Z",
+  "metrics": {
+    "avgTicketPaise": 465615,
+    "aiCostPerCapturedPaise": 3,
+    "at1MPerMonth": {
+      "paymentsPerMonth": 1000000,
+      "channelRevenueInr": 93123000,
+      "aiServingCostInr": 30000,
+      "netInr": 93093000
+    }
+  },
+  "formula": "revenue = avgTicket × N × MDR% ; aiCost = measured ₹/captured-payment × N ; net = revenue − aiCost",
+  "assumptions": {
+    "mdrPct": 2,
+    "model": {
+      "name": "gpt-4o-mini-class (assumed)",
+      "inputUsdPer1M": 0.15,
+      "outputUsdPer1M": 0.6
+    },
+    "usdToInr": 83,
+    "projectionPaymentsPerMonth": 1000000,
+    "notes": [
+      "MDR is Razorpay's public list pricing quoted as an assumption — not a negotiated claim.",
+      "Model prices are public list prices for a gpt-4o-mini-class model, quoted as an assumption.",
+      "avg ticket and ₹/captured-payment are measured from the deterministic seed ledger (make meter).",
+      "Every input to this projection regenerates via `make project`; nothing is hand-written."
+    ]
+  },
+  "regenerate": "make project"
+}

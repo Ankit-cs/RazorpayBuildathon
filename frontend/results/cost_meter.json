@@ -1,0 +1,39 @@
+{
+  "status": "measured",
+  "measured_at": "2026-09-01T21:15:47.269Z",
+  "metrics": {
+    "gmvPaise": 6053000,
+    "capturedCount": 13,
+    "refusedCount": 6,
+    "attackCount": 12,
+    "refusalRate": 0.3158,
+    "tokensIn": 678,
+    "tokensOut": 6624,
+    "aiCostPaise": 34,
+    "aiCostPerCapturedPaise": 3,
+    "channelRevenuePaise": 121060,
+    "netPaise": 121026,
+    "p50DecisionMs": 1,
+    "p99DecisionMs": 1
+  },
+  "assumptions": {
+    "mdrPct": 2,
+    "model": {
+      "name": "gpt-4o-mini-class (assumed)",
+      "inputUsdPer1M": 0.15,
+      "outputUsdPer1M": 0.6
+    },
+    "usdToInr": 83,
+    "projectionPaymentsPerMonth": 1000000
+  },
+  "projection": {
+    "paymentsPerMonth": 1000000,
+    "avgTicketPaise": 465615,
+    "revenueInrPerMonth": 93123000,
+    "aiCostInrPerMonth": 30000,
+    "netInrPerMonth": 93093000,
+    "formula": "revenue = avgTicket × N × MDR% ; aiCost = measured ₹/captured-payment × N ; net = revenue − aiCost"
+  },
+  "notes": "Meter over the deterministic 48h seed ledger (the same history the live app boots with). Token counts are deterministic estimates for the rules brain (chars/4); with AGENT_BRAIN=llm the live app meters real provider tokens instead. Latency is machine-dependent. MDR and model prices are labeled assumptions, not claims.",
+  "regenerate": "make meter"
+}
