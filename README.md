@@ -1,7 +1,7 @@
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="public/wordmark-dark.svg" />
-    <img src="public/wordmark-light.svg" alt="ProjectX" width="300" />
+    <source media="(prefers-color-scheme: dark)" srcset="frontend/public/wordmark-dark.svg" />
+    <img src="frontend/public/wordmark-light.svg" alt="ProjectX" width="300" />
   </picture>
 </p>
 
@@ -122,16 +122,28 @@ flowchart TD
 ### 1. Proof-of-Policy Invariant (PoPI) Formulation
 
 Let an autonomous purchase directive be parameterized by a policy tuple $\mathcal{P}$:
-$$\mathcal{P} = \langle B_{\max}, S_{\max}, \mathcal{C}_{\text{allowed}}, \tau_{\text{nonce}}, t_{\text{issued}}, \Delta t_{\text{valid}} \rangle$$
+
+$$
+\mathcal{P} = \langle B_{\max}, S_{\max}, \mathcal{C}_{\text{allowed}}, \tau_{\text{nonce}}, t_{\text{issued}}, \Delta t_{\text{valid}} \rangle
+$$
 
 For any transaction proposal $\mathcal{X} = \langle P_{\text{base}}, P_{\text{ship}}, c_{\text{item}} \rangle$, the deterministic assertion predicate $\Phi(\mathcal{X}, \mathcal{P})$ checks budget ceilings, shipping bounds, and validity envelopes. If $\Phi(\mathcal{X}, \mathcal{P}) = 1$, the engine computes the cryptographic commitment token $\sigma_{\text{PoPI}}$:
-$$\sigma_{\text{PoPI}} = \text{HMAC-SHA256}_{K_{\text{agent}}}\Big(\text{SHA3-512}\big(\mathcal{P} \parallel \mathcal{X} \parallel \tau_{\text{nonce}}\big)\Big)$$
+
+$$
+\sigma_{\text{PoPI}} = \text{HMAC-SHA256}_{K_{\text{agent}}}\Big(\text{SHA3-512}\big(\mathcal{P} \parallel \mathcal{X} \parallel \tau_{\text{nonce}}\big)\Big)
+$$
 
 ### 2. Dual-Layer Post-Quantum Audit Protocol
 
 To guarantee 10-year non-repudiation against quantum Shor/Grover attacks, every transaction block $\mathcal{B}_k$ in the immutable audit ledger is statefully chained:
-$$\mathcal{H}_k = \text{SHA3-512}\big(\mathcal{B}_k \parallel \mathcal{H}_{k-1}\big)$$
-$$\Sigma_k = \text{Sign}_{\text{ML-DSA-65}}\big(\text{SK}_{\text{agent}}, \mathcal{H}_k\big)$$
+
+$$
+\mathcal{H}_k = \text{SHA3-512}\big(\mathcal{B}_k \parallel \mathcal{H}_{k-1}\big)
+$$
+
+$$
+\Sigma_k = \text{Sign}_{\text{ML-DSA-65}}\big(\text{SK}_{\text{agent}}, \mathcal{H}_k\big)
+$$
 
 ### 3. Razorpay Route Atomic Multi-Merchant Settlement
 
