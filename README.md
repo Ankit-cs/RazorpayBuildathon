@@ -399,7 +399,7 @@ cd ../frontend
 npm install
 npm run dev
 ```
-- Client Dashboard: `http://localhost:5173`
+- Client Dashboard: `http://localhost:3000`
 
 ---
 
@@ -424,7 +424,7 @@ npm run dev
    - **Build Command**: `npm run build`
    - **Output Directory**: `.next`
 3. Add Environment Variable (Optional):
-   - `VITE_API_URL`: `https://your-backend.onrender.com` (or proxy via rewrites)
+   - `NEXT_PUBLIC_API_URL`: `https://your-backend.onrender.com` (or proxy via Next.js rewrites)
 4. Click **Deploy**. Your enterprise client is live on Vercel Edge!
 
 ---
@@ -468,31 +468,19 @@ ProjectX-Agentic-Commerce-Razorpay/
 │   └── requirements.txt
 ├── frontend/
 │   ├── src/
-│   │   ├── components/
-│   │   │   ├── A2ANegotiationView.jsx      # Visual A2A negotiation arena
-│   │   │   ├── AuditLedgerModal.jsx        # Audit ledger & JSON/CSV exporter
-│   │   │   ├── BuyerAgentStudio.jsx        # Procurement directive & policy bounds
-│   │   │   ├── CommandPalette.jsx          # Quick command bar (Ctrl+K)
-│   │   │   ├── ConversationalChat.jsx      # Voice shopping & sentiment chat
-│   │   │   ├── ExplainableDecisionCard.jsx # Transparent AI decision breakdown
-│   │   │   ├── FailureScenarios.jsx        # 5-scenario interactive failure suite
-│   │   │   ├── Header.jsx                  # Main navigation & system telemetry
-│   │   │   ├── JudgeTourModal.jsx          # Interactive guided evaluator tour
-│   │   │   ├── LiveExecutionTrace.jsx      # Step-by-step trace & PoPI badge
-│   │   │   ├── MetricsDashboard.jsx        # Growth metrics & Latency waterfall
-│   │   │   ├── MultiMerchantCartView.jsx   # Virtual cart & Razorpay Route split
-│   │   │   ├── MultiMerchantComparison.jsx # Deal hunter comparison table
-│   │   │   ├── NeuralIntelligenceView.jsx  # Neural embeddings & transformer telemetry
-│   │   │   ├── PoPIBadgeModal.jsx          # Proof-of-Policy inspector modal
-│   │   │   ├── RazorpayConfigModal.jsx     # Runtime key configuration modal
-│   │   │   ├── RazorpayGapsView.jsx        # Architectural analysis of RZP gaps
-│   │   │   ├── RAGKnowledgeView.jsx        # RAG commerce knowledge base explorer
-│   │   │   ├── StorefrontView.jsx          # 3-merchant storefront catalogs
-│   │   │   └── VulcanTelemetryView.jsx     # Vulcan AI telemetry dashboard
-│   │   ├── App.jsx                         # Main React application
-│   │   └── index.css                       # Dark glassmorphism design system
+│   │   ├── app/
+│   │   │   ├── page.tsx                    # Main Next.js Control Room Dashboard
+│   │   │   ├── layout.tsx                  # Global layout & HTML structure
+│   │   │   └── globals.css                 # Dark glassmorphism design system
+│   │   ├── components/verity/
+│   │   │   ├── A2ANegotiationView.tsx      # Visual A2A negotiation arena
+│   │   │   ├── ConversationalChat.tsx      # Voice shopping & sentiment chat
+│   │   │   ├── ExplainableDecisionCard.tsx # Transparent AI decision breakdown
+│   │   │   ├── LiveExecutionTrace.tsx      # Step-by-step trace & PoPI badge
+│   │   │   ├── MultiMerchantCartView.tsx   # Virtual cart & Razorpay Route split
+│   │   │   └── PoPIBadgeModal.tsx          # Proof-of-Policy inspector modal
 │   ├── package.json
-│   └── vite.config.js
+│   └── next.config.ts                      # Next.js App Router Configuration
 └── README.md
 ```
 
