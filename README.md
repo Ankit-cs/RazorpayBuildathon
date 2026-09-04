@@ -1,4 +1,4 @@
-# VERITY: Autonomous Bounded Agentic Commerce Protocol on Razorpay Rails
+# ProjectX: Autonomous Bounded Agentic Commerce Protocol on Razorpay Rails
 
 > **Formal Specification & Reference Implementation**  
 > *Submitted to the Razorpay AI Builder Track 1: AI Growth & Agentic Commerce*  
@@ -15,7 +15,7 @@ Autonomous Generative AI agents increasingly interact with open product catalogs
 - **Multi-Merchant Fragmentation**: Multi-vendor carts lack atomic split settlement rails, causing partial checkout drops.
 - **Replay & Injection Exploits**: Malicious actors can execute adversarial jailbreaks to manipulate agent procurement parameters or replay stale order nonces.
 
-**VERITY** introduces an enterprise-grade, post-quantum resilient agentic commerce protocol built on **Razorpay rails**. It couples **Deterministic Proof-of-Policy Invariants (PoPI)** with **Agent-to-Agent (A2A) Game-Theoretic Bargaining**, **Post-Quantum Cryptographic Audit Trails (NIST FIPS 204)**, and **Razorpay Route Atomic Split Transfers**, eliminating financial hallucination risk while achieving sub-120ms execution latency.
+**ProjectX** introduces an enterprise-grade, post-quantum resilient agentic commerce protocol built on **Razorpay rails**. It couples **Deterministic Proof-of-Policy Invariants (PoPI)** with **Agent-to-Agent (A2A) Game-Theoretic Bargaining**, **Post-Quantum Cryptographic Audit Trails (NIST FIPS 204)**, and **Razorpay Route Atomic Split Transfers**, eliminating financial hallucination risk while achieving sub-120ms execution latency.
 
 ---
 
@@ -108,7 +108,7 @@ $$\Sigma_k = \text{Sign}_{\text{ML-DSA-65}}\big(\text{SK}_{\text{agent}}, \mathc
 ```mermaid
 sequenceDiagram
     autonumber
-    participant Buyer as VERITY Buyer Agent
+    participant Buyer as ProjectX Buyer Agent
     participant Policy as PoPI Invariant Engine
     participant A2A as Federated Merchant Swarm
     participant Rails as Razorpay Orders API
@@ -185,7 +185,7 @@ To ensure zero-trust communication across edge agent workers and Razorpay gatewa
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────────────────────┐
-│                          VERITY DEEP LEARNING & ML INTELLIGENCE LAYER                       │
+│                          ProjectX DEEP LEARNING & ML INTELLIGENCE LAYER                       │
 ├──────────────────────────────┬──────────────────────────────┬───────────────────────────────┤
 │ 1. 64-DIM VECTOR RETRIEVAL   │ 2. CONTEXTUAL BANDIT RL      │ 3. VULCAN TRANSFORMER ROUTER  │
 │ Dense MiniLM Embeddings      │ Thompson Sampling & LinUCB   │ 3,142 Real-Time Signals       │
@@ -201,7 +201,7 @@ $$\mathbf{e}_{\text{query}} = \frac{f_{\theta}(\text{query})}{\|f_{\theta}(\text
 $$\text{Similarity}(\mathbf{e}_{\text{query}}, \mathbf{e}_{\text{item}}) = \mathbf{e}_{\text{query}} \cdot \mathbf{e}_{\text{item}} = \cos(\theta)$$
 
 ### 2. Contextual Multi-Armed Bandit Reinforcement Learning (LinUCB)
-To dynamically offer accessory bundles and upsells without violating the user's spending boundary $B_{\max}$, VERITY maintains arm models with confidence bound $\alpha$:
+To dynamically offer accessory bundles and upsells without violating the user's spending boundary $B_{\max}$, ProjectX maintains arm models with confidence bound $\alpha$:
 
 $$\mathbf{A}_a = \mathbf{I}_d + \sum_{\tau=1}^t \mathbf{x}_\tau \mathbf{x}_\tau^T, \quad \mathbf{b}_a = \sum_{\tau=1}^t r_\tau \mathbf{x}_\tau$$
 
@@ -260,7 +260,7 @@ $$\text{Score}_{\text{acquirer}} = \sigma\left( \mathbf{W}_{\text{out}} \mathbf{
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
-│                                   VERITY PROTOCOL CAPABILITIES                                   │
+│                                   ProjectX PROTOCOL CAPABILITIES                                   │
 ├────┬──────────────────────────────────────┬────────────────────────────────────────────┬────────┤
 │ #  │ Feature Module                       │ Formal Architecture & Algorithmic Design   │ Status │
 ├────┼──────────────────────────────────────┼────────────────────────────────────────────┼────────┤
@@ -309,7 +309,7 @@ TOTAL END-TO-END LATENCY                  │ 108.6 ms (P99 < 142 ms)
 
 ## ◆ Standard Model Context Protocol (MCP) Tools
 
-VERITY exposes an RFC-compliant Model Context Protocol server (`/api/mcp/tools`) providing 9 operational tools for external autonomous agents:
+ProjectX exposes an RFC-compliant Model Context Protocol server (`/api/mcp/tools`) providing 9 operational tools for external autonomous agents:
 
 ```json
 [
@@ -382,8 +382,8 @@ OK (100% Passing)
 ### 1. Initialize Backend API Server Locally
 ```bash
 # Clone the repository
-git clone https://github.com/YeshwanthRajSelvaraj/VERITY-Agentic-Commerce-Razorpay.git
-cd VERITY-Agentic-Commerce-Razorpay/backend
+git clone https://github.com/YeshwanthRajSelvaraj/ProjectX-Agentic-Commerce-Razorpay.git
+cd ProjectX-Agentic-Commerce-Razorpay/backend
 
 # Install dependencies & launch
 pip install -r requirements.txt
@@ -407,17 +407,17 @@ npm run dev
 
 ### Deploy Backend to Render (Free Web Service)
 1. Navigate to [dashboard.render.com](https://dashboard.render.com) and click **New + > Web Service**.
-2. Connect the GitHub repository `YeshwanthRajSelvaraj/VERITY-Agentic-Commerce-Razorpay`.
+2. Connect the GitHub repository `YeshwanthRajSelvaraj/ProjectX-Agentic-Commerce-Razorpay`.
 3. Configure settings:
    - **Root Directory**: `backend`
    - **Runtime**: `Python 3`
    - **Build Command**: `pip install -r requirements.txt`
    - **Start Command**: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
    - **Health Check Path**: `/api/health`
-4. Click **Deploy Web Service**. Your backend will be live at `https://verity-backend.onrender.com`.
+4. Click **Deploy Web Service**. Your backend will be live at `https://ProjectX-backend.onrender.com`.
 
 ### Deploy Frontend to Vercel (Production Edge)
-1. Navigate to [vercel.com/new](https://vercel.com/new) and import `YeshwanthRajSelvaraj/VERITY-Agentic-Commerce-Razorpay`.
+1. Navigate to [vercel.com/new](https://vercel.com/new) and import `YeshwanthRajSelvaraj/ProjectX-Agentic-Commerce-Razorpay`.
 2. Configure settings:
    - **Root Directory**: `frontend`
    - **Framework Preset**: `Next.js`
@@ -432,7 +432,7 @@ npm run dev
 ## ✦ System Directory Structure
 
 ```
-VERITY-Agentic-Commerce-Razorpay/
+ProjectX-Agentic-Commerce-Razorpay/
 ├── backend/
 │   ├── app/
 │   │   ├── agents/
