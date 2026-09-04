@@ -16,6 +16,14 @@ from .mandate import build_mandate_body, sign_mandate, IssueMandateInput
 from .engine import run_transaction, new_span, TxInput
 from .payments import rail_info
 
+import sys
+import os
+# Add parent dir to path so we can import core modules
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from core.popi import popi_engine
+from core.rag_engine import rag_engine
+from core.security_guard import security_guard
+
 class ChatEvent(BaseModel):
     id: str
     ts: int
@@ -127,7 +135,12 @@ async def agent_turn(rt: ProjectXRuntime, session_id: str, message: str, adapter
     
     events.append(ChatEvent(id=eid(), ts=now(), role="user", text=message))
     
-    intent = parse_intent(message)
+    is_safe, sanitized, alert_reason = security_guard.sanitize_and_check_prompt(message)
+    if not is_safe:
+        say(f"Security Alert: {alert_reason}. Request blocked.")
+        return TurnResult(events=events, session=session, needCheckoutRefresh=False, suggestions=[])
+    
+    intent = parse_intent(sanitized)
     tokens_in = 0
     tokens_out = 0
     
@@ -155,7 +168,7 @@ async def agent_turn(rt: ProjectXRuntime, session_id: str, message: str, adapter
         tokens_in = usage["tokensIn"]
         tokens_out = usage["tokensOut"]
         if parsed:
-            intent = llm_to_intent(parsed.model_dump(), message)
+            intent = llm_to_intent(parsed.model_dump(), sanitized)
         new_span(rt.deps, f"tr_ses_{session.sessionId}", session.lastOrderId or "none", "llm.parseIntent", ms, adapter, {
             "tokensIn": tokens_in, "tokensOut": tokens_out, "model": llm.name
         })
@@ -258,7 +271,12 @@ async def execute_tool(rt: ProjectXRuntime, session: BuyerSession, name: str, ar
         if ceiling is None:
             ceiling = parse_price_ceiling(query)
         res = search_catalog(query, 3, ceilingPaise=ceiling)
-        note = f"budget <= {rupees(ceiling)}" if ceiling else None
+        
+        # Augment with RAG Knowledge
+        rag_res = rag_engine.retrieve_context(query, top_k=1)
+        rag_note = f" (Knowledge: {rag_res[0].document.title})" if rag_res else ""
+
+        note = f"budget <= {rupees(ceiling)}{rag_note}" if ceiling else f"Knowledge: {rag_note}"
         events.append(ChatEvent(id=eid(), ts=int(time.time() * 1000), kind="products", products=[p.model_dump() for p in res], note=note))
         if len(res) == 1:
             say("One match.")
@@ -339,4 +357,25 @@ async def execute_tool(rt: ProjectXRuntime, session: BuyerSession, name: str, ar
         say("The gate said no — the card above shows why.")
         return {"bound": False, "refused": True, "code": tx.decision.code, "orderId": tx.orderId}
         
+    elif name == "validate_policy":
+        # PoPI check
+        budget_limit_inr = args.get("budget_limit_inr", 0.0)
+        max_shipping_inr = args.get("max_shipping_inr", 0.0)
+        popi = popi_engine.generate_policy_commitment(
+            order_ref=f"ord_{uuid.uuid4().hex[:8]}",
+            budget_limit_inr=budget_limit_inr,
+            max_shipping_inr=max_shipping_inr,
+            allowed_categories=[]
+        )
+        events.append(ChatEvent(id=eid(), ts=int(time.time() * 1000), kind="popi", note=f"PoPI Token Generated: {popi.popi_token}"))
+        return {"popi_token": popi.popi_token, "budget_commitment_paise": popi.budget_commitment_paise}
+        
+    elif name == "negotiate_offer":
+        item = args.get("item_name", "item")
+        target_inr = args.get("target_price_inr", 0)
+        say(f"Negotiating A2A price for {item} (target: {rupees(target_inr * 100)})...")
+        # Simulate A2A concession
+        concession_inr = target_inr * 1.05 # 5% above target
+        return {"concession_price_inr": concession_inr, "status": "agreement_reached"}
+
     return {"error": f"unknown tool {name}"}
