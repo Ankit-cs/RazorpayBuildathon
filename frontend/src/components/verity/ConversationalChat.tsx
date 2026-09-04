@@ -252,7 +252,7 @@ export function ConversationalChat({ onExecutePurchase, onSelectTab }) {
                       </div>
                     )}
                   </div>
-                  <span style={{ fontSize: '0.68rem', color: 'var(--text-dim)', alignSelf: isUser ? 'flex-end' : 'flex-start' }}>
+                  <span suppressHydrationWarning style={{ fontSize: '0.68rem', color: 'var(--text-dim)', alignSelf: isUser ? 'flex-end' : 'flex-start' }}>
                     {m.timestamp}
                   </span>
                 </div>

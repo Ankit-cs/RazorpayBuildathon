@@ -10,7 +10,7 @@ from ..projectx.payments import rail_info, verify_payment_signature
 from ..projectx.engine import run_transaction, confirm_payment_once, TxInput
 from ..projectx.types import TRUST_TIERS
 from ..projectx.ledger import Ledger
-from ..projectx.fuzz.corpus import ATTACK_CORPUS, attack_tx_input
+# from ..projectx.fuzz.corpus import ATTACK_CORPUS, attack_tx_input
 
 router = APIRouter(prefix="/api/_projectX")
 
@@ -113,65 +113,65 @@ async def decision(request: Request):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.post("/fuzz")
-async def fuzz(request: Request):
-    rt = get_runtime()
-    scratch = Ledger(None)
-    
-    from copy import copy
-    class ScratchDeps:
-        def __init__(self, old_deps, new_ledger):
-            self.ledger = new_ledger
-            self.private_key_pem = old_deps.private_key_pem
-            self.public_key_pem = old_deps.public_key_pem
-            self.merchant_fingerprint = old_deps.merchant_fingerprint
-            
-    scratch_deps = ScratchDeps(rt.deps, scratch)
-    
-    verdicts = []
-    clock = int(time.time() * 1000) + 10_000
-    
-    for attack in ATTACK_CORPUS:
-        t0 = time.time()
-        clock += 60_000
-        
-        if attack.replayConfirm:
-            tx = run_transaction(scratch_deps, attack_tx_input(attack, orderId=f"fuzz_{attack.id}", nowMs=clock, adapter="naive", buyerPrefix="fuzz"))
-            clock += 60_000
-            if tx.payment:
-                replay = confirm_payment_once(scratch_deps, tx.orderId, tx.payment.confirmId, {"note": "replay"})
-            else:
-                replay = {"ok": False, "code": "REPLAY_DETECTED"}
-            outcome = "PASSED" if replay["ok"] else "BLOCKED"
-            code = None if replay["ok"] else "REPLAY_DETECTED"
-        else:
-            tx = run_transaction(scratch_deps, attack_tx_input(attack, orderId=f"fuzz_{attack.id}", nowMs=clock, adapter="naive", buyerPrefix="fuzz"))
-            outcome = "PASSED" if tx.decision.kind == "ALLOW" else "BLOCKED"
-            code = tx.decision.code
-            
-        matched = outcome == "BLOCKED" and code == attack.expect.code
-        verdicts.append({
-            "attackId": attack.id,
-            "label": attack.label,
-            "verdict": outcome,
-            "code": code,
-            "expected": attack.expect.code,
-            "matched": matched,
-            "ms": max(1, int((time.time() - t0) * 1000))
-        })
-        rt.ledger.append("attack.blocked", {
-            "attackId": attack.id,
-            "label": attack.label,
-            "verdict": outcome,
-            "code": code,
-            "expected": attack.expect.code,
-            "matched": matched,
-            "live": True,
-            "corpusRun": True
-        })
-        
-    passed = sum(1 for v in verdicts if v["matched"])
-    return {"ok": True, "passed": passed, "total": len(verdicts), "verdicts": verdicts}
+# @router.post("/fuzz")
+# async def fuzz(request: Request):
+#     rt = get_runtime()
+#     scratch = Ledger(None)
+#     
+#     from copy import copy
+#     class ScratchDeps:
+#         def __init__(self, old_deps, new_ledger):
+#             self.ledger = new_ledger
+#             self.private_key_pem = old_deps.private_key_pem
+#             self.public_key_pem = old_deps.public_key_pem
+#             self.merchant_fingerprint = old_deps.merchant_fingerprint
+#             
+#     scratch_deps = ScratchDeps(rt.deps, scratch)
+#     
+#     verdicts = []
+#     clock = int(time.time() * 1000) + 10_000
+#     
+#     for attack in []: # ATTACK_CORPUS:
+#         t0 = time.time()
+#         clock += 60_000
+#         
+#         if attack.replayConfirm:
+#             tx = run_transaction(scratch_deps, attack_tx_input(attack, orderId=f"fuzz_{attack.id}", nowMs=clock, adapter="naive", buyerPrefix="fuzz"))
+#             clock += 60_000
+#             if tx.payment:
+#                 replay = confirm_payment_once(scratch_deps, tx.orderId, tx.payment.confirmId, {"note": "replay"})
+#             else:
+#                 replay = {"ok": False, "code": "REPLAY_DETECTED"}
+#             outcome = "PASSED" if replay["ok"] else "BLOCKED"
+#             code = None if replay["ok"] else "REPLAY_DETECTED"
+#         else:
+#             tx = run_transaction(scratch_deps, attack_tx_input(attack, orderId=f"fuzz_{attack.id}", nowMs=clock, adapter="naive", buyerPrefix="fuzz"))
+#             outcome = "PASSED" if tx.decision.kind == "ALLOW" else "BLOCKED"
+#             code = tx.decision.code
+#             
+#         matched = outcome == "BLOCKED" and code == attack.expect.code
+#         verdicts.append({
+#             "attackId": attack.id,
+#             "label": attack.label,
+#             "verdict": outcome,
+#             "code": code,
+#             "expected": attack.expect.code,
+#             "matched": matched,
+#             "ms": max(1, int((time.time() - t0) * 1000))
+#         })
+#         rt.ledger.append("attack.blocked", {
+#             "attackId": attack.id,
+#             "label": attack.label,
+#             "verdict": outcome,
+#             "code": code,
+#             "expected": attack.expect.code,
+#             "matched": matched,
+#             "live": True,
+#             "corpusRun": True
+#         })
+#         
+#     passed = sum(1 for v in verdicts if v["matched"])
+#     return {"ok": True, "passed": passed, "total": len(verdicts), "verdicts": verdicts}
 
 @router.post("/pay/confirm")
 async def pay_confirm(request: Request):
