@@ -10,6 +10,14 @@ from .types import Mandate, TrustTier, GateDecision, TRUST_TIERS
 from .catalog import CATALOG, catalog_snapshot, Product, CatalogSnapshot
 from .payments import simulated_capture, simulated_order, PaymentCapture, rail_info
 
+import sys
+import os
+# Add parent dir to path so we can import core modules
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from core.smart_cart import smart_cart_engine, CartItem
+from core.split_settlement import split_settlement_engine
+from core.vulcan import vulcan_engine
+
 class EngineDeps:
     def __init__(self, ledger: Ledger, private_key_pem: str, public_key_pem: str, merchant_fingerprint: str):
         self.ledger = ledger
@@ -198,18 +206,54 @@ def run_transaction(deps: EngineDeps, input_data: TxInput) -> TxOutcome:
         }, t0 + 7)
         return TxOutcome(orderId=order_id, traceId=trace_id, mandate=mandate, decision=decision, payment=None, railOrderId=None)
         
-    # 4. pay
+    # 4. smart cart & split settlement
+    cart_items_for_smart_cart = []
+    for it in input_data.items:
+        p = catalog.byId.get(it.productId)
+        if p:
+            cart_items_for_smart_cart.append(CartItem(
+                id=f"item_{p.id}",
+                product_id=p.id,
+                product_name=p.name,
+                category=p.category,
+                merchant_id="merchant_novatech", # Default for demo
+                merchant_name="NovaTech Gear",
+                price_inr=p.pricePaise / 100,
+                shipping_cost_inr=0.0,
+                quantity=it.quantity
+            ))
+            
+    if cart_items_for_smart_cart:
+        smart_cart_res = smart_cart_engine.evaluate_smart_cart(cart_items_for_smart_cart)
+        deps.ledger.append_at("cart.optimized", smart_cart_res.model_dump(), t0 + 7)
+        
+        # Route Split plan
+        primary = cart_items_for_smart_cart[0].model_dump()
+        accessory = cart_items_for_smart_cart[1].model_dump() if len(cart_items_for_smart_cart) > 1 else None
+        split_plan = split_settlement_engine.plan_split_transfer(primary, accessory)
+        deps.ledger.append_at("settlement.split_planned", split_plan, t0 + 8)
+        
+    # Vulcan Payment Routing Telemetry
+    vulcan_analysis = vulcan_engine.evaluate_transaction_telemetry(
+        order_id=order_id,
+        amount_inr=decision.totalPaise / 100,
+        merchant_name="NovaTech Gear",
+        category="Electronics"
+    )
+    deps.ledger.append_at("vulcan.telemetry_evaluated", vulcan_analysis.__dict__, t0 + 9)
+
+    # 5. pay
     payment = simulated_capture(decision.totalPaise)
     rail = rail_info()
     rail_order = simulated_order(decision.totalPaise, order_id)
     
-    new_span(deps, trace_id, order_id, "payment.create", 3, input_data.adapter, {"rail": payment.rail}, None, t0 + 8)
+    new_span(deps, trace_id, order_id, "payment.create", 3, input_data.adapter, {"rail": payment.rail}, None, t0 + 10)
     
     deps.ledger.append_at("payment.captured", {
         "orderId": order_id, "rail": payment.rail, "simulated": payment.simulated,
         "paymentId": payment.paymentId, "confirmId": payment.confirmId, "totalPaise": decision.totalPaise,
         "railOrderId": rail_order.railOrderId, "railLabel": rail.label, "traceId": trace_id
-    }, t0 + 9)
+    }, t0 + 11)
     
     return TxOutcome(orderId=order_id, traceId=trace_id, mandate=mandate, decision=decision, payment=payment, railOrderId=rail_order.railOrderId)
 
